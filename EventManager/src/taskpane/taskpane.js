@@ -13,7 +13,7 @@ Office.onReady((info) => {
   }
 });
 
-export async function run() {
+function run() {
   /**
    * Insert your Outlook code here
    */
