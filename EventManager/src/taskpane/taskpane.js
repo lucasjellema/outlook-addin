@@ -30,11 +30,7 @@ export async function run() {
       console.log(`Current item is a ${itemType}. A message could be an email, meeting request, meeting response, or meeting cancellation.`);
       break;
   }
-
-
-
 }
-
 
 function writeEventDetails(item) {
   Office.context.mailbox.item.subject.getAsync(function (asyncResult) {
@@ -74,94 +70,124 @@ function writeEventDetails(item) {
   getAttendees()
 }
 
+const eventResponses=[]
 
 function getAttendees() {
   // This snippet gets an appointment's required and optional attendees and groups them by their response.
   const appointment = Office.context.mailbox.item;
   let attendees;
+  // clear event responses
+  eventResponses.length = 0
   if (Object.keys(appointment.organizer).length === 0) {
     // Get attendees as the meeting organizer.
-    appointment.requiredAttendees.getAsync((result) => {
-      if (result.status !== Office.AsyncResultStatus.Succeeded) {
-        console.log(result.error.message);
-        return;
-      }
-
-      attendees = result.value;
-      document.getElementById("eventDetails").innerHTML = result.value
-      printAttendees(attendees)
-      appointment.optionalAttendees.getAsync((result) => {
+    // Ensure this runs in the context of an appointment
+    if (Office.context.mailbox.item.itemType === Office.MailboxEnums.ItemType.Appointment) {
+      appointment.requiredAttendees.getAsync((result) => {
         if (result.status !== Office.AsyncResultStatus.Succeeded) {
           console.log(result.error.message);
           return;
         }
+        attendees = result.value;
+        appointment.optionalAttendees.getAsync((result) => {
+          if (result.status !== Office.AsyncResultStatus.Succeeded) {
+            console.log(result.error.message);
+            return;
+          }
 
-        attendees = attendees.concat(result.value);
+          attendees = attendees.concat(result.value);
+          //{"emailAddress":"AndrAs.Hetenyi@AMIS.nl","displayName":"András Hetényi","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"Andre.van.Winssen@conclusion.nl","displayName":"Andre van Winssen","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"angelique.ludwig@dnagroup.nl","displayName":"Angelique Ludwig","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"arjan.molenaar@conclusion.nl","displayName":"Arjan Mole
+          eventResponses.push(attendees)
+          
+          
+          // document.getElementById("eventDetails").innerHTML = JSON.stringify(eventResponses)
+          // count the number of eventResponses where appointmentResponse == "accepted"
 
-        // Organize attendees by their meeting response and print this to the console.
-        organizeByResponse(attendees);
+          let acceptedCount = 0
+          let declinedCount = 0
+          let tentativeCount = 0
+          for (const attendee of attendees) {
+            if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted) {
+              acceptedCount++
+            }
+            if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined ) {
+              declinedCount++
+            }
+            if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative) {
+              tentativeCount++
+            }
+          }
+          document.getElementById("event-attendee-count").innerHTML = "<b>Attendee count:</b> <br/> Accepted: " 
+                                                     + acceptedCount + " / Tentative:"+tentativeCount 
+                                                     +" / Declined:"+declinedCount + "  / " + attendees.length
+          document.getElementById("copyAttendees").onclick = function() {copyAttendees(attendees)}
+          document.getElementById("copyAttendees").style = "display:block"
+
+        });
       });
+    } else {
+      // Get attendees as a meeting attendee.
+      attendees = appointment.requiredAttendees;
+      attendees = attendees.concat(appointment.optionalAttendees);
+
+
+      eventResponses.push(attendees)
+    }
+  }
+}
+
+const copyAttendees= (attendees) => {
+  // copy eventResponses to clipboard 
+  let text = ""
+  const fieldSeparator = "\t"
+  const recordSeparator = "\n"
+  for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse))) {
+    if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative)
+     text += attendee.displayName.split(" ")[0] +fieldSeparator+ attendee.displayName +fieldSeparator + attendee.emailAddress+ fieldSeparator + attendee.appointmentResponse + recordSeparator
+  }
+  navigator.clipboard.writeText(text)
+}
+
+  function organizeByResponse(attendees) {
+    const accepted = [];
+    const declined = [];
+    const noResponse = [];
+    const tentative = [];
+    attendees.forEach(attendee => {
+      switch (attendee.appointmentResponse) {
+        case Office.MailboxEnums.ResponseType.Accepted:
+          accepted.push(attendee);
+          break;
+        case Office.MailboxEnums.ResponseType.Declined:
+          declined.push(attendee);
+          break;
+        case Office.MailboxEnums.ResponseType.None:
+          noResponse.push(attendee);
+          break;
+        case Office.MailboxEnums.ResponseType.Tentative:
+          tentative.push(attendee);
+          break;
+        case Office.MailboxEnums.ResponseType.Organizer:
+          console.log(`Organizer: ${attendee.displayName}, ${attendee.emailAddress}`);
+          break;
+      }
     });
-  } else {
-    // Get attendees as a meeting attendee.
-    attendees = appointment.requiredAttendees;
-    attendees = attendees.concat(appointment.optionalAttendees);
 
-    // Organize attendees by their meeting response and print this to the console.
-    organizeByResponse(attendees);
-    printAttendees(attendees)
   }
-}
 
-function organizeByResponse(attendees) {
-  const accepted = [];
-  const declined = [];
-  const noResponse = [];
-  const tentative = [];
-  attendees.forEach(attendee => {
-    switch (attendee.appointmentResponse) {
-      case Office.MailboxEnums.ResponseType.Accepted:
-        accepted.push(attendee);
-        break;
-      case Office.MailboxEnums.ResponseType.Declined:
-        declined.push(attendee);
-        break;
-      case Office.MailboxEnums.ResponseType.None:
-        noResponse.push(attendee);
-        break;
-      case Office.MailboxEnums.ResponseType.Tentative:
-        tentative.push(attendee);
-        break;
-      case Office.MailboxEnums.ResponseType.Organizer:
-        console.log(`Organizer: ${attendee.displayName}, ${attendee.emailAddress}`);
-        break;
-    }
-  });
+  // function printAttendees(attendees) {
+  //   let text = "Accepted: " + attendees.length
+  //   if (attendees.length === 0) {
+  //     console.log("None");
+  //   } else {
+  //     for (const attendee of attendees) {
+  //       text += `XX ${attendee.displayName}, ${attendee.emailAddress}, ${attendee.appointmentResponse}`
+  //     }
+  //     // attendees.forEach(attendee => {
+  //     //   console.log(` ${attendee.displayName}, ${attendee.emailAddress}`);
+  //     //   text += `XX ${attendee.displayName}, ${attendee.emailAddress}`
+  //     //   document.getElementById("eventDetails").innerHTML = text
+  //     // });
 
-  // List attendees by their response.
-  console.log("Accepted: ");
-  printAttendees(accepted);
-  // console.log("Declined: ");
-  // printAttendees(declined);
-  // console.log("Tentative: ");
-  // printAttendees(tentative);
-  // console.log("No response: ");
-  // printAttendees(noResponse);
-}
-
-function printAttendees(attendees) {
-  let text = "Accepted: "
-  if (attendees.length === 0) {
-    console.log("None");
-  } else {
-    for (const attendee of attendees) {
-      text += `XX ${attendee.displayName}, ${attendee.emailAddress}`
-    }
-    // attendees.forEach(attendee => {
-    //   console.log(` ${attendee.displayName}, ${attendee.emailAddress}`);
-    //   text += `XX ${attendee.displayName}, ${attendee.emailAddress}`
-    //   document.getElementById("eventDetails").innerHTML = text
-    // });
-    document.getElementById("eventDetails").innerHTML = text
-  }
-}
+  //   }
+  //   document.getElementById("eventDetails").innerHTML = text
+  // }
