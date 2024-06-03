@@ -5,7 +5,7 @@
   <ProviderName>Lucas @ Conclusion</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="EventManager"/>
-  <Description DefaultValue="Active when an event is opened  by the creator of the event."/>
+  <Description DefaultValue="Collect attendees in Excel pasteable format."/>
   <IconUrl DefaultValue="https://lucasjellema.github.io/outlook-addin/EventManager/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://lucasjellema.github.io/outlook-addin/EventManager/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
@@ -62,7 +62,7 @@
                     <SourceLocation resid="Taskpane.Url"/>
                   </Action>
                 </Control>
-                <Control xsi:type="Button" id="ActionButton">
+                <!-- <Control xsi:type="Button" id="ActionButton">
                   <Label resid="ActionButton.Label"/>
                   <Supertip>
                     <Title resid="ActionButton.Label"/>
@@ -76,7 +76,7 @@
                   <Action xsi:type="ExecuteFunction">
                     <FunctionName>action</FunctionName>
                   </Action>
-                </Control>
+                </Control> -->
               </Group>
             </OfficeTab>
           </ExtensionPoint>
@@ -95,12 +95,12 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://lucasjellema.github.io/outlook-addin/EventManager/src/taskpane/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Taskpane"/>
+        <bt:String id="GroupLabel" DefaultValue="Conclusion Event Manager"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Manage Attendees"/>
         <bt:String id="ActionButton.Label" DefaultValue="Perform an action"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying all available properties."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane with event and attendeed details."/>
         <bt:String id="ActionButton.Tooltip" DefaultValue="Perform an action when clicked."/>
       </bt:LongStrings>
     </Resources>
