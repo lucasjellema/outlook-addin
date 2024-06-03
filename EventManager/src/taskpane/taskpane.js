@@ -140,7 +140,9 @@ const copyAttendees= (attendees) => {
   let text = ""
   const fieldSeparator = "\t"
   const recordSeparator = "\n"
-  for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse))) {
+
+  for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse) 
+                                                  || a.displayName.localeCompare(b.displayName) ) ){
     if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative)
      text += attendee.displayName.split(" ")[0] +fieldSeparator+ attendee.displayName +fieldSeparator + attendee.emailAddress+ fieldSeparator + attendee.appointmentResponse + recordSeparator
   }
