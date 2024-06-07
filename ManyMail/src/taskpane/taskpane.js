@@ -68,7 +68,6 @@ function createTableFromData(data) {
   return table;
 }
 
-// Handle paste event on textarea
 const processData = () => {
   const recipientsTextarea = document.getElementById('recipients');
   const data = recipientsTextarea.value;
@@ -113,7 +112,7 @@ function sendEmails() {
         // wait some time between mails
         setTimeout(() => {
           notify("Sending email to " + recipient.email + " (" + index + " of " + recipientsData.length + ")");
-          saveEmail(recipient.email, personalizedSubject, personalizedBody)
+          prepareForSendEmail(recipient.email, personalizedSubject, personalizedBody)
         }, index * 1200); // saveEmail(recipient, personalizedBody);
       });
     }
@@ -130,7 +129,7 @@ const notify = (message) => {
   Office.context.mailbox.item.notificationMessages.replaceAsync("action", notification);
 }
 
-function saveEmail(recipient, subject, body) {
+function prepareForSendEmail(recipient, subject, body) {
   Office.context.mailbox.displayNewMessageFormAsync({
     toRecipients: [recipient], // Copies the To line from current item
     // ccRecipients: ["sam@contoso.com"],

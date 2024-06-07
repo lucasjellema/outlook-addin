@@ -9,10 +9,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Conclusion ManyMail Task Pane Add-in</title>
-
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
-
     <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui#/. -->
     <link rel="stylesheet"
         href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
@@ -20,7 +18,6 @@
     <!-- Template styles -->
     <link href="taskpane.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body class="ms-font-m ms-welcome ms-Fabric">
     <header class="ms-welcome__header ms-bgColor-neutralLighter">
         <img width="90" height="90" src="../../assets/logo-filled.png" alt="Contoso" title="Contoso" />
@@ -31,15 +28,12 @@
             your add-in to see app body.</h2>
     </section>
     <main id="app-body" class="ms-welcome__main" style="display: none;">
-
         <h2 class="ms-font-xl">Send Email to Many</h2>
         <form id="emailForm">
             <label for="recipients">Recipients (comma separated):</label>
             <textarea id="recipients" name="recipients" rows="4" cols="40"></textarea>
-            <!-- <input type="text" id="recipients" name="recipients" /> -->
             <button type="button" id="sendEmails">Send Email to All Recipients</button>
             <button type="button" id="run">Process Data</button>
-            <!-- <button type="button" id="newMail">Open New Mail</button> -->
         </form>
         <h3>Place holders in email</h3>
         <div id="placeholders"></div>
