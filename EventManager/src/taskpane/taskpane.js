@@ -14,12 +14,7 @@ Office.onReady((info) => {
 });
 
 function run() {
-  /**
-   * Insert your Outlook code here
-   */
-
   const item = Office.context.mailbox.item;
-
   const itemType = Office.context.mailbox.item.itemType;
   switch (itemType) {
     case Office.MailboxEnums.ItemType.Appointment:
@@ -93,15 +88,8 @@ function getAttendees() {
             console.log(result.error.message);
             return;
           }
-
           attendees = attendees.concat(result.value);
-          //{"emailAddress":"AndrAs.Hetenyi@AMIS.nl","displayName":"András Hetényi","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"Andre.van.Winssen@conclusion.nl","displayName":"Andre van Winssen","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"angelique.ludwig@dnagroup.nl","displayName":"Angelique Ludwig","appointmentResponse":"none","recipientType":"user"},{"emailAddress":"arjan.molenaar@conclusion.nl","displayName":"Arjan Mole
           eventResponses.push(attendees)
-          
-          
-          // document.getElementById("eventDetails").innerHTML = JSON.stringify(eventResponses)
-          // count the number of eventResponses where appointmentResponse == "accepted"
-
           let acceptedCount = 0
           let declinedCount = 0
           let tentativeCount = 0
@@ -128,14 +116,15 @@ function getAttendees() {
       // Get attendees as a meeting attendee.
       attendees = appointment.requiredAttendees;
       attendees = attendees.concat(appointment.optionalAttendees);
-
-
       eventResponses.push(attendees)
     }
   }
 }
 
 const copyAttendees= (attendees) => {
+
+  const includeNone = document.getElementById('includeNone').checked
+  const includeDeclined = document.getElementById('includeDeclined').checked
   // copy eventResponses to clipboard 
   let text = ""
   const fieldSeparator = "\t"
@@ -143,8 +132,13 @@ const copyAttendees= (attendees) => {
 
   for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse) 
                                                   || a.displayName.localeCompare(b.displayName) ) ){
-    if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative)
-     text += attendee.displayName.split(" ")[0] +fieldSeparator+ attendee.displayName +fieldSeparator + attendee.emailAddress+ fieldSeparator + attendee.appointmentResponse + recordSeparator
+    if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted 
+      || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative
+      ||( attendee.appointmentResponse === Office.MailboxEnums.ResponseType.None && includeNone)
+      ||( attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined && includeDeclined)
+    )
+     text += attendee.displayName.split(" ")[0] +fieldSeparator+ attendee.displayName +fieldSeparator + attendee.emailAddress
+             + fieldSeparator + attendee.appointmentResponse + recordSeparator
   }
   navigator.clipboard.writeText(text)
 }
@@ -155,7 +149,7 @@ const copyAttendees= (attendees) => {
     const noResponse = [];
     const tentative = [];
     attendees.forEach(attendee => {
-      switch (attendee.appointmentResponse) {
+      switch (attendee.appointmentResponse) {x
         case Office.MailboxEnums.ResponseType.Accepted:
           accepted.push(attendee);
           break;
