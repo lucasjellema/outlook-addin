@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "Outlook New Mail Auto Sender",
+    "version": "1.0",
+    "description": "A Chrome extension for the Outlook Web Client. This extension immediately sends a new mail that has been created by the ManyMail addin ",
+      "permissions": [
+        "tabs","activeTab","scripting",
+        "webNavigation"
+      ],
+      "content_scripts": [
+        {"matches": ["https://outlook.office.com/*"],
+          "js": ["content.js"],
+          "all_frames": true,
+          "match_about_blank": true,
+          "run_at": "document_end"
+        }
+      ],
+      "host_permissions": [
+        "<all_urls>"
+      ]
+    }
+    
