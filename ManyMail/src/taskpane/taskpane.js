@@ -1,10 +1,3 @@
-/*
- * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
- * See LICENSE in the project root for license information.
- */
-
-/* global document, Office */
-
 Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("sideload-msg").style.display = "none";
@@ -12,7 +5,6 @@ Office.onReady((info) => {
     document.getElementById("run").onclick = processData;
     document.getElementById("sendEmails").onclick = sendEmails;
     findPlaceHolders()
-    //  document.getElementById("newMail").onclick = askForNewMail;
   }
 });
 
@@ -26,7 +18,7 @@ function findPlaceHolders() {
       const uniqueSubjectMatches = [...subject.matchAll(regex)].map(match => match[0]);
       const uniqueBodyMatches = [...body.matchAll(regex)].map(match => match[0]);
       const uniqueMatches = [...new Set([...uniqueSubjectMatches, ...uniqueBodyMatches])];
-      document.getElementById("placeholders").innerHTML = "{{email}}, "+uniqueMatches.join(", ");
+      document.getElementById("placeholders").innerHTML = "{{email}}, " + uniqueMatches.join(", ");
     }
   });
 }
@@ -78,10 +70,7 @@ function createTableFromData(data) {
 
 // Handle paste event on textarea
 const processData = () => {
-
-
   const recipientsTextarea = document.getElementById('recipients');
-
   const data = recipientsTextarea.value;
   const parsedData = csvToObjectArray(data);
   recipientsData = parsedData
@@ -100,24 +89,6 @@ Jane,Doe,3lT9H@example.com,Google
 */
 
 
-const askForNewMail = () => {
-  // send message from iframe to parent - hopefully consumed by Chrome Extension to click on New Mail button in UI
-  parent.postMessage({ action: "NEW_MAIL", sender: "MY_OUTLOOK_ADDIN", eventType: "outlookMailEvent", data: { subject: "THE SUBJECT" } }, '*');
-}
-
-
-function run() {
-
-  const message = {
-    type: Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage,
-    message: "Performed action.",
-    icon: "Icon.80x80",
-    persistent: true,
-  };
-
-  // Show a notification message.
-  Office.context.mailbox.item.notificationMessages.replaceAsync("action", message);
-}
 
 const personalize = (theString, recipient) => {
   // for all properties in the recipient replace each occurrence of {{property}} in theString with the value of that property
@@ -160,87 +131,18 @@ const notify = (message) => {
 }
 
 function saveEmail(recipient, subject, body) {
-
   Office.context.mailbox.displayNewMessageFormAsync({
     toRecipients: [recipient], // Copies the To line from current item
     // ccRecipients: ["sam@contoso.com"],
     bccRecipients: ["autosend@contoso.com"], // signal to Chrome Extension that it can automatically send this mail
     subject: subject,
     htmlBody: body
-    // , just an attempt - does not work
-    // attachments: [
-    //   {
-    //     type: "file",
-    //     name: "image.png",
-    //     url: "http://www.cutestpaw.com/wp-content/uploads/2011/11/Cute-Black-Dogs-s.jpg",
-    //     isInline: true
-    //   }
-    // ]
   }, (asyncResult) => {
     console.log(JSON.stringify(asyncResult));
-    // write asyncResult to task pane
-    // find DIV element with id == notification
-    // set its textcontent tpo asyncResult
-    // const div = document.getElementById("notification");
-    // div.textContent = JSON.stringify(asyncResult);
-
-
-    //  Office.context.mailbox.item.to.setAsync([{ emailAddress: recipient }], (result) => {
-    //   if (result.status === Office.AsyncResultStatus.Succeeded) {
-    //   Office.context.mailbox.item.body.setAsync(body, { coercionType: Office.CoercionType.Html }, (result) => {
-    //   message.message = "update body for "+recipient;
-    // Office.context.mailbox.item.notificationMessages.replaceAsync("action", message);
-    // if (result.status === Office.AsyncResultStatus.Succeeded) {
-    // message.message = "update body succes, now save  "+recipient;
-
-    // Office.context.mailbox.item.saveAsync((result) => {
-    //   if (result.status === Office.AsyncResultStatus.Succeeded) {
-    //     notify("save success ");
-    //     Office.context.mailbox.item.close();
-    //     notify("Closed, next");
-    //   }
-    // });
   })
 }
 
-
-//       });
-//     }
-//   });
-// }
-
-
-
-
-function sendEmail(recipient, subject, body) {
-
-  const soapMessage = `
-  <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Header>
-      <t:RequestServerVersion Version="Exchange2013" />
-    </soap:Header>
-    <soap:Body>
-      <m:CreateItem MessageDisposition="SendAndSaveCopy">
-        <m:Items>
-          <t:Message>
-            <t:Subject>${subject}</t:Subject>
-            <t:Body BodyType="HTML">${body}</t:Body>
-            <t:ToRecipients>
-              <t:Mailbox><t:EmailAddress>${recipient}</t:EmailAddress></t:Mailbox>
-            </t:ToRecipients>
-          </t:Message>
-        </m:Items>
-      </m:CreateItem>
-    </soap:Body>
-  </soap:Envelope>`;
-
-  Office.context.mailbox.makeEwsRequestAsync(soapMessage, function (result) {
-    if (result.status === Office.AsyncResultStatus.Succeeded) {
-      console.log('Email sent successfully.');
-    } else {
-      console.error('Error sending email:', result.error.message);
-    }
-  });
+const askForNewMail = () => {
+  // send message from iframe to parent - hopefully consumed by Chrome Extension to click on New Mail button in UI
+  parent.postMessage({ action: "NEW_MAIL", sender: "MY_OUTLOOK_ADDIN", eventType: "outlookMailEvent", data: { subject: "THE SUBJECT" } }, '*');
 }
-
-
