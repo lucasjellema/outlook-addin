@@ -102,6 +102,8 @@ const personalize = (theString, recipient) => {
 
 
 function sendEmails() {
+  const includeBcc = document.getElementById('includeBcc').checked
+
   Office.context.mailbox.item.body.getAsync(Office.CoercionType.Html, (result) => {
     if (result.status === Office.AsyncResultStatus.Succeeded) {
       const emailBody = result.value;
@@ -112,7 +114,7 @@ function sendEmails() {
         // wait some time between mails
         setTimeout(() => {
           notify("Sending email to " + recipient.email + " (" + index + " of " + recipientsData.length + ")");
-          prepareForSendEmail(recipient.email, personalizedSubject, personalizedBody)
+          prepareForSendEmail(recipient.email, personalizedSubject, personalizedBody, includeBcc)
         }, index * 1200); // saveEmail(recipient, personalizedBody);
       });
     }
@@ -129,14 +131,17 @@ const notify = (message) => {
   Office.context.mailbox.item.notificationMessages.replaceAsync("action", notification);
 }
 
-function prepareForSendEmail(recipient, subject, body) {
-  Office.context.mailbox.displayNewMessageFormAsync({
+function prepareForSendEmail(recipient, subject, body, includeBcc) {
+
+  const mail = {
     toRecipients: [recipient], // Copies the To line from current item
-    // ccRecipients: ["sam@contoso.com"],
-    bccRecipients: ["autosend@contoso.com"], // signal to Chrome Extension that it can automatically send this mail
     subject: subject,
     htmlBody: body
-  }, (asyncResult) => {
+  }
+  if (includeBcc) {
+    mail.bccRecipients = ["autosend@contoso.com"]  // signal to Chrome Extension that it can automatically send this mail
+  }    
+  Office.context.mailbox.displayNewMessageFormAsync(mail, (asyncResult) => {
     console.log(JSON.stringify(asyncResult));
   })
 }
