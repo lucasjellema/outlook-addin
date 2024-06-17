@@ -149,7 +149,7 @@ const copyAttendees= (attendees) => {
     const noResponse = [];
     const tentative = [];
     attendees.forEach(attendee => {
-      switch (attendee.appointmentResponse) {x
+      switch (attendee.appointmentResponse) {
         case Office.MailboxEnums.ResponseType.Accepted:
           accepted.push(attendee);
           break;
