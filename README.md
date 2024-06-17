@@ -100,11 +100,37 @@ To activate this addin in your Outlook environment:
 
 This by itself is not very useful - you have just seen the foundation for a whole range of addins you can create - to facilitate your email composition process. Note: Addins not only can edit the mail, they can also read the contents of the mail as well as other properties.
 
+If you want to remove an addin, you (again) have to navigate to https://aka.ms/olksideload - and remove the addin in the Manage Addins dialog window.
+![](images/remove-addin.png) 
+
 ## Image Inserter Addin - add image into new email 
 
 Follow the step by step instructions in [this document](https://github.com/lucasjellema/outlook-addin/blob/main/README-image-inserter.md) to create an Outlook Addin. It acts on a message that is being composed in the message editor. When the Addin is activated, it will cause an image - and a very pretty one! - to be inserted in the message under construction at the position of the cursor.
 
+![](images/addin-imageinserter.png)
 
+## Event Manager - Gather Appointment Details
+
+Note: I only got this addin to work in the "old" Windows Desktop Client - not in the Outlook web client.
+
+This addin allows me to collect details about the positive, tentative and negative responses to an invitation to an appointment. When the button is clicked for the addin, the taskpane is shown with details for the appointment. The taskpane also contains a button that when pressed will cause the details for the RSVPs to be copied to the clipboard.
+![](images/event-mgr-addin.png)
+
+Here the button is clicked, the details are copied to the clipboard and pasted in the an Excel sheet:
+![](images/paste-rsvps-to-excel.png) 
+
+The best way to see the addin in action is to run it locally. If you have a local clone of the GitHub repository at https://github.com/lucasjellema/outlook-addin, you can open the *EventManager* folder in VS Code.  
+
+Open the terminal in this folder. Then run `npm start`. This will run the local web server that will serve the addin's sources. Next, the addin is configured into the local Outlook Client and then that client is opened. Switch to Outlook classic look (if your client opens in the new Windows look and feel)
+
+Find an appointment you have created and that you have received at least one RSVP to. The Event Manager Addin button should be shown in the ribbon. Click on the button.
+![](images/eventmgr-addin.png)
+
+This brings up the taskpane. Next click on the link *Fetch Event Details*. This will populate the pane with details for the appointment and the RSVPs. You can now also press the button to copy the RSVP details in Tab Delimited Format to the clipboard. Paste the contents of the clipboard in Excel to further process these event details.
+
+### Implementation Details
+
+The most interesting details for this Addin are found in the taskpane.js file that contains the logic that inspects the appointment details, displays them in the taskpane and makes them available in the clipboard.  
 
 
 # Resources
