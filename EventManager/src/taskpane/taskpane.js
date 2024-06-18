@@ -65,7 +65,7 @@ function writeEventDetails(item) {
   getAttendees()
 }
 
-const eventResponses=[]
+const eventResponses = []
 
 function getAttendees() {
   // This snippet gets an appointment's required and optional attendees and groups them by their response.
@@ -97,17 +97,17 @@ function getAttendees() {
             if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted) {
               acceptedCount++
             }
-            if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined ) {
+            if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined) {
               declinedCount++
             }
             if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative) {
               tentativeCount++
             }
           }
-          document.getElementById("event-attendee-count").innerHTML = "<b>Attendee count:</b> <br/> Accepted: " 
-                                                     + acceptedCount + " / Tentative:"+tentativeCount 
-                                                     +" / Declined:"+declinedCount + "  / " + attendees.length
-          document.getElementById("copyAttendees").onclick = function() {copyAttendees(attendees)}
+          document.getElementById("event-attendee-count").innerHTML = "<b>Attendee count:</b> <br/> Accepted: "
+            + acceptedCount + " / Tentative:" + tentativeCount
+            + " / Declined:" + declinedCount + "  / " + attendees.length
+          document.getElementById("copyAttendees").onclick = function () { copyAttendees(attendees) }
           document.getElementById("copyAttendees").style = "display:block"
 
         });
@@ -121,7 +121,7 @@ function getAttendees() {
   }
 }
 
-const copyAttendees= (attendees) => {
+const copyAttendees = (attendees) => {
 
   const includeNone = document.getElementById('includeNone').checked
   const includeDeclined = document.getElementById('includeDeclined').checked
@@ -130,60 +130,78 @@ const copyAttendees= (attendees) => {
   const fieldSeparator = "\t"
   const recordSeparator = "\n"
 
-  for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse) 
-                                                  || a.displayName.localeCompare(b.displayName) ) ){
-    if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted 
-      || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative
-      ||( attendee.appointmentResponse === Office.MailboxEnums.ResponseType.None && includeNone)
-      ||( attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined && includeDeclined)
-    )
-     text += attendee.displayName.split(" ")[0] +fieldSeparator+ attendee.displayName +fieldSeparator + attendee.emailAddress
-             + fieldSeparator + attendee.appointmentResponse + recordSeparator
-  }
-  navigator.clipboard.writeText(text)
+
+  if (attendees.length > 0)
+    if (attendees[0].appointmentResponse) {
+
+
+      for (const attendee of attendees.sort((a, b) => a.appointmentResponse.localeCompare(b.appointmentResponse)
+        || a.displayName.localeCompare(b.displayName))) {
+        if (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Accepted
+          || attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Tentative
+          || (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.None && includeNone)
+          || (attendee.appointmentResponse === Office.MailboxEnums.ResponseType.Declined && includeDeclined)
+        )
+          text += attendee.displayName.split(" ")[0] + fieldSeparator + attendee.displayName + fieldSeparator + attendee.emailAddress
+            + fieldSeparator + attendee.appointmentResponse + recordSeparator
+      }
+      navigator.clipboard.writeText(text)
+    } else {  // in case we are looking at an appointment in editing mode - when no RSVPs are available, only a list of all people invited
+      try {
+      if (attendees[0].recipientType) {
+        for (const attendee of attendees.filter(attendee => attendee.recipientType === "other").sort((a, b) => a.displayName.localeCompare(b.displayName))) {
+            text += attendee.displayName.split(" ")[0] + fieldSeparator + attendee.displayName + fieldSeparator + attendee.emailAddress
+              + fieldSeparator + "unknown" + recordSeparator
+        }
+        navigator.clipboard.writeText(text)
+      }
+      } catch (error) {
+        console.log('alternative processing of invited attendees failed',error)
+      }
+    }
 }
 
-  function organizeByResponse(attendees) {
-    const accepted = [];
-    const declined = [];
-    const noResponse = [];
-    const tentative = [];
-    attendees.forEach(attendee => {
-      switch (attendee.appointmentResponse) {
-        case Office.MailboxEnums.ResponseType.Accepted:
-          accepted.push(attendee);
-          break;
-        case Office.MailboxEnums.ResponseType.Declined:
-          declined.push(attendee);
-          break;
-        case Office.MailboxEnums.ResponseType.None:
-          noResponse.push(attendee);
-          break;
-        case Office.MailboxEnums.ResponseType.Tentative:
-          tentative.push(attendee);
-          break;
-        case Office.MailboxEnums.ResponseType.Organizer:
-          console.log(`Organizer: ${attendee.displayName}, ${attendee.emailAddress}`);
-          break;
-      }
-    });
+function organizeByResponse(attendees) {
+  const accepted = [];
+  const declined = [];
+  const noResponse = [];
+  const tentative = [];
+  attendees.forEach(attendee => {
+    switch (attendee.appointmentResponse) {
+      case Office.MailboxEnums.ResponseType.Accepted:
+        accepted.push(attendee);
+        break;
+      case Office.MailboxEnums.ResponseType.Declined:
+        declined.push(attendee);
+        break;
+      case Office.MailboxEnums.ResponseType.None:
+        noResponse.push(attendee);
+        break;
+      case Office.MailboxEnums.ResponseType.Tentative:
+        tentative.push(attendee);
+        break;
+      case Office.MailboxEnums.ResponseType.Organizer:
+        console.log(`Organizer: ${attendee.displayName}, ${attendee.emailAddress}`);
+        break;
+    }
+  });
 
-  }
+}
 
-  // function printAttendees(attendees) {
-  //   let text = "Accepted: " + attendees.length
-  //   if (attendees.length === 0) {
-  //     console.log("None");
-  //   } else {
-  //     for (const attendee of attendees) {
-  //       text += `XX ${attendee.displayName}, ${attendee.emailAddress}, ${attendee.appointmentResponse}`
-  //     }
-  //     // attendees.forEach(attendee => {
-  //     //   console.log(` ${attendee.displayName}, ${attendee.emailAddress}`);
-  //     //   text += `XX ${attendee.displayName}, ${attendee.emailAddress}`
-  //     //   document.getElementById("eventDetails").innerHTML = text
-  //     // });
+// function printAttendees(attendees) {
+//   let text = "Accepted: " + attendees.length
+//   if (attendees.length === 0) {
+//     console.log("None");
+//   } else {
+//     for (const attendee of attendees) {
+//       text += `XX ${attendee.displayName}, ${attendee.emailAddress}, ${attendee.appointmentResponse}`
+//     }
+//     // attendees.forEach(attendee => {
+//     //   console.log(` ${attendee.displayName}, ${attendee.emailAddress}`);
+//     //   text += `XX ${attendee.displayName}, ${attendee.emailAddress}`
+//     //   document.getElementById("eventDetails").innerHTML = text
+//     // });
 
-  //   }
-  //   document.getElementById("eventDetails").innerHTML = text
-  // }
+//   }
+//   document.getElementById("eventDetails").innerHTML = text
+// }
