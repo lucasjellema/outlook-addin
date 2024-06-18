@@ -128,10 +128,23 @@ Find an appointment you have created and that you have received at least one RSV
 
 This brings up the taskpane. Next click on the link *Fetch Event Details*. This will populate the pane with details for the appointment and the RSVPs. You can now also press the button to copy the RSVP details in Tab Delimited Format to the clipboard. Paste the contents of the clipboard in Excel to further process these event details.
 
+Note: alternatively you can also run this addin following these steps - without running anything locally:
+* download file `manifest.xml` from https://github.com/lucasjellema/outlook-addin/blob/main/EventManager/manifestt-github-pages.xml to your local disk
+* navigate to https://aka.ms/olksideload - this will open a dialog in the context of Outlook to manage addins. 
+* add an addin from file: upload the file manifestt-github-pages.xml that you just downloaded ; this will add the addin to your Outlook configuration
+* start the Windows Outlook Desktop Client in "classic mode"; then follow the steps described overhead.
+
 ### Implementation Details
 
-The most interesting details for this Addin are found in the taskpane.js file that contains the logic that inspects the appointment details, displays them in the taskpane and makes them available in the clipboard.  
+The most interesting details for this Addin are found in the [taskpane.js](https://github.com/lucasjellema/outlook-addin/blob/main/EventManager/src/taskpane/taskpane.js) file that contains the logic that inspects the appointment details, displays them in the taskpane and makes them available in the clipboard.  
 
+
+## Other Addins
+
+The GitHub repository contains a few other addins whose sources could be of interest to you:
+* [Email Property Retriever](https://github.com/lucasjellema/outlook-addin/tree/main/EmailPropertyRetriever) - simple addin that allows you to fetch some properties of the email open in reading mode in the taskpane. Demonstrates very simple interaction through Office JS API regarding an mail message
+* [RSVP Handler](https://github.com/lucasjellema/outlook-addin/tree/main/RSVPHandler) - an addin that is available when looking at an RSVP to an appointment you have organized. The addin allows you to write details for this RSVP to local storage and to inspect the totals collected in local storage for this appointment. These totals can be displayed and copied
+* [ManyMail](https://github.com/lucasjellema/outlook-addin/tree/main/ManyMail) - an addin that allows you to send a personalized email to many recipients, based on placeholders in the mail message (subject and body) and a CSV dataset with values for each recipient.   
 
 # Resources
 
