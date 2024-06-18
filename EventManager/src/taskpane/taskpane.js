@@ -145,6 +145,7 @@ const copyAttendees = (attendees) => {
           text += attendee.displayName.split(" ")[0] + fieldSeparator + attendee.displayName + fieldSeparator + attendee.emailAddress
             + fieldSeparator + attendee.appointmentResponse + recordSeparator
       }
+      document.getElementById("eventDetails").innerHTML = text
       navigator.clipboard.writeText(text)
     } else {  // in case we are looking at an appointment in editing mode - when no RSVPs are available, only a list of all people invited
       try {
@@ -153,6 +154,7 @@ const copyAttendees = (attendees) => {
             text += attendee.displayName.split(" ")[0] + fieldSeparator + attendee.displayName + fieldSeparator + attendee.emailAddress
               + fieldSeparator + "unknown" + recordSeparator
         }
+        document.getElementById("eventDetails").innerHTML = text
         navigator.clipboard.writeText(text)
       }
       } catch (error) {
