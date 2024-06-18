@@ -150,17 +150,20 @@ const copyAttendees = (attendees) => {
       navigator.clipboard.writeText(text)
     } else {  // in case we are looking at an appointment in editing mode - when no RSVPs are available, only a list of all people invited
       try {
-      if (attendees[0].recipientType) {
-        for (const attendee of attendees.filter(attendee => attendee.recipientType === "other").sort((a, b) => a.displayName.localeCompare(b.displayName))) {
-            text += attendee.displayName.split(" ")[0] + fieldSeparator + attendee.displayName + fieldSeparator + attendee.emailAddress
-              + fieldSeparator + "unknown" + recordSeparator
+        if (attendees[0].recipientType) {
+          const fieldSeparatorAlt = ","
+          const recordSeparatorAlt = ";"
+
+          for (const attendee of attendees.filter(attendee => attendee.recipientType === "other").sort((a, b) => a.displayName.localeCompare(b.displayName))) {
+            text += attendee.displayName.split(" ")[0] + fieldSeparatorAlt + attendee.displayName + fieldSeparatorAlt + attendee.emailAddress
+              + fieldSeparatorAlt + "unknown" + recordSeparatorAlt
+          }
+          window.focus();
+          document.getElementById("eventDetails").innerHTML = text
+          navigator.clipboard.writeText(text)
         }
-        window.focus();
-        document.getElementById("eventDetails").innerHTML = text
-        navigator.clipboard.writeText(text)
-      }
       } catch (error) {
-        console.log('alternative processing of invited attendees failed',error)
+        console.log('alternative processing of invited attendees failed', error)
       }
     }
 }
