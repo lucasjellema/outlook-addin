@@ -152,7 +152,7 @@ const copyAttendees = (attendees) => {
       try {
         if (attendees[0].recipientType) {
           const fieldSeparatorAlt = ","
-          const recordSeparatorAlt = ";"
+          const recordSeparatorAlt = ";\n"
 
           for (const attendee of attendees.filter(attendee => attendee.recipientType === "other").sort((a, b) => a.displayName.localeCompare(b.displayName))) {
             text += attendee.displayName.split(" ")[0] + fieldSeparatorAlt + attendee.displayName + fieldSeparatorAlt + attendee.emailAddress
@@ -160,6 +160,8 @@ const copyAttendees = (attendees) => {
           }
           window.focus();
           document.getElementById("eventDetails").innerHTML = text
+          document.getElementById("recipients").value = text
+          
           navigator.clipboard.writeText(text)
         }
       } catch (error) {
